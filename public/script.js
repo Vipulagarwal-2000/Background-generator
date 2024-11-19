@@ -21,8 +21,13 @@ const download = document.getElementById("download");
 
 //this function is complex will wait for it to be done
 function downloadFile() {
+  const [color1RGBA, color2RGBA, color3RGBA] = rgbaMethod();
+  const [direction, direction2, direction3] = directions();
+  const gradientTypeValue = gradientTypeInput.value;
   const gradientCSSView = gradientCSS; // Get gradient CSS from the textarea
-  const size = download.value || 500; // Set size for the gradient image, default to 500px
+  const size = Number(download.value) || 500; // Set size for the gradient image, default to 500px
+
+  console.log(gradientTypeValue);
 
   // Create a canvas element
   const canvas = document.createElement("canvas");
@@ -35,35 +40,381 @@ function downloadFile() {
   // Create the gradient depending on the type (conic, linear, etc.)
   let gradient;
 
-  if (gradientCSSView.includes("conic-gradient")) {
-    // Example of creating a conic-gradient on canvas
-    gradient = ctx.createConicGradient(
-      (90 * Math.PI) / 180,
-      size / 2,
-      size / 2
-    ); // 90 degrees as radian
-    gradient.addColorStop(0, "rgba(84, 107, 194, 0.9)");
-    gradient.addColorStop(0.5, "rgba(108, 161, 165, 0.7)");
-    gradient.addColorStop(1, "rgba(147, 106, 87, 0.8)");
-  } else if (gradientCSSView.includes("linear-gradient")) {
-    // Example for linear-gradient
-    gradient = ctx.createLinearGradient(0, 0, size, size); // Diagonal gradient
-    gradient.addColorStop(0, "rgba(84, 107, 194, 0.9)");
-    gradient.addColorStop(0.5, "rgba(108, 161, 165, 0.7)");
-    gradient.addColorStop(1, "rgba(147, 106, 87, 0.8)");
+  if (gradientTypeValue.includes("conic")) {
+    ctx.fillStyle = "rgba(255, 255, 255, 1)";
+    ctx.fillRect(0, 0, size, size);
+
+    //////////////////////////////////
+
+    // Canvas center point
+    const centerX = size / 2;
+    const centerY = size / 2;
+
+    // Starting angle in radians for "from" options
+    let startAngle = (( - 90) * Math.PI) / 180;
+
+    // Convert the "from" angle to radians
+    if (direction3.startsWith("from")) {
+      const angle = direction3.split(" ")[1]; // Extract the angle (e.g., "0deg", "45deg", etc.)
+     
+      startAngle = ((parseInt(angle) - 90) * Math.PI) / 180; // Convert to radians
+    }
+
+    // Define the center coordinates for the "at" options
+    let centerXCoord = centerX;
+    let centerYCoord = centerY;
+
+    // Ensure 'size' is a valid non-zero number
+    if (isNaN(size) || size <= 0) {
+      console.error("Invalid size value.");
+      return; // Exit if size is invalid
+    }
+
+    // Handle "at" options for center positions and custom positions
+    if (direction3.includes("at")) {
+      const position = direction3.split("at ")[1].trim(); // Extract position like "center", "top left", etc.
+
+      if (position === "center") {
+        centerXCoord = centerX;
+        centerYCoord = centerY;
+      } else if (position === "top left") {
+        centerXCoord = 0;
+        centerYCoord = 0;
+      } else if (position === "top right") {
+        centerXCoord = size;
+        centerYCoord = 0;
+      } else if (position === "bottom left") {
+        centerXCoord = 0;
+        centerYCoord = size;
+      } else if (position === "bottom right") {
+        centerXCoord = size;
+        centerYCoord = size;
+      } else {
+        // For custom positions like "at 25% 25%" or "at 50% 10%"
+        const positionParts = position.split(" ");
+
+        // Validate percentage values before using them
+        if (positionParts.length === 2) {
+          const percentX = parseFloat(positionParts[0]);
+          const percentY = parseFloat(positionParts[1]);
+
+          // Check if percentages are valid numbers (finite and not NaN)
+          if (
+            !isNaN(percentX) &&
+            !isNaN(percentY) &&
+            isFinite(percentX) &&
+            isFinite(percentY)
+          ) {
+            centerXCoord = (percentX / 100) * size;
+            centerYCoord = (percentY / 100) * size;
+          } else {
+            console.error(
+              "Invalid percentage values for position: " + position
+            );
+            // Default to center if invalid
+            centerXCoord = centerX;
+            centerYCoord = centerY;
+          }
+        } else {
+          console.error("Invalid position format: " + position);
+          // Default to center if format is incorrect
+          centerXCoord = centerX;
+          centerYCoord = centerY;
+        }
+      }
+    }
+
+    // Make sure the center coordinates are finite numbers before creating the gradient
+    if (!isFinite(centerXCoord) || !isFinite(centerYCoord)) {
+      console.error("Invalid center coordinates: ", centerXCoord, centerYCoord);
+      return; // Exit to avoid passing invalid values to createConicGradient
+    }
+
+
+    console.log(startAngle, centerXCoord, centerYCoord);
+
+    // Create the conic gradient using the calculated values
+    gradient = ctx.createConicGradient(startAngle, centerXCoord, centerYCoord);
+
+    //////////////////////////////////////
+
+    gradient.addColorStop(0, `${color1RGBA}`);
+    gradient.addColorStop(0.5, `${color2RGBA}`);
+    gradient.addColorStop(1, `${color3RGBA}`);
+  } else if (gradientCSSView.includes("linear")) {
+    /*
+     Why This Happens
+     Canvas Transparency Blending:
+
+     The canvas blends transparent gradient stops (rgba) with the canvas's default background, which is usually fully transparent 
+     (rgba(0, 0, 0, 0) by default). This blending creates a darker appearance, 
+     especially when lighter colors have low alpha values (e.g., 0.1 or 0.3).
+   */
+
+    // solution1: Fill the canvas with a solid white background
+    ctx.fillStyle = "rgba(255, 255, 255, 1)";
+    ctx.fillRect(0, 0, size, size); // Ensure this covers the entire canvas
+
+    // solution 2
+    /*
+
+    Use globalAlpha for Transparency
+    Another approach is to adjust the global transparency using ctx.globalAlpha:
+    ctx.globalAlpha = 0.8; // Set a higher transparency for the entire gradient
+    This ensures all colors are blended more evenly with the background.
+    */
+
+
+    if (direction === "to right") {
+      // Gradient from left to right
+      gradient = ctx.createLinearGradient(0, 0, size, 0);
+    } else if (direction === "to left") {
+      // Gradient from right to left
+      gradient = ctx.createLinearGradient(size, 0, 0, 0);
+    } else if (direction === "to top") {
+      // Gradient from bottom to top
+      gradient = ctx.createLinearGradient(0, size, 0, 0);
+    } else if (direction === "to bottom") {
+      // Gradient from top to bottom
+      gradient = ctx.createLinearGradient(0, 0, 0, size);
+    } else if (direction === "45deg") {
+      // Gradient at a 45-degree angle (top-left to bottom-right)
+      gradient = ctx.createLinearGradient(0, size, size, 0);
+    } else if (direction === "135deg") {
+      // Gradient at a 135-degree angle (top-right to bottom-left)
+      gradient = ctx.createLinearGradient(0, 0, size, size);
+    }
+
+
+
+
+
+
+
+    gradient.addColorStop(0, `${color1RGBA}`);
+    gradient.addColorStop(0.5, `${color2RGBA}`);
+    gradient.addColorStop(1, `${color3RGBA}`);
   } else {
     // Fallback or radial gradient
+
+    ctx.fillStyle = "rgba(255, 255, 255, 1)";
+    ctx.fillRect(0, 0, size, size);
+
+
+/////////////////////////////////////////////
+
+  // Canvas center point
+  const centerX = size / 2;
+  const centerY = size / 2;
+
+  // Default radius values for various "closest-side" and "farthest-side" options
+  const closestSide = Math.min(size / 2, size / 2); // Minimum dimension
+  const farthestSide = Math.max(size / 2, size / 2); // Maximum dimension
+
+  // Handle different gradient options
+  if (direction2 === "circle") {
+    // Basic circle gradient from the center
     gradient = ctx.createRadialGradient(
-      size / 2,
-      size / 2,
+      centerX,
+      centerY,
       0,
-      size / 2,
-      size / 2,
+      centerX,
+      centerY,
       size / 2
     );
-    gradient.addColorStop(0, "rgba(84, 107, 194, 0.9)");
-    gradient.addColorStop(0.5, "rgba(108, 161, 165, 0.7)");
-    gradient.addColorStop(1, "rgba(147, 106, 87, 0.8)");
+  }
+  // Ellipse gradient case
+  else if (direction2 === "ellipse") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      size / 2
+    );
+  }
+  // Closest side gradient for a circle
+  else if (direction2 === "circle closest-side") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      closestSide
+    );
+  }
+  // Farthest side gradient for a circle
+  else if (direction2 === "circle farthest-side") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      farthestSide
+    );
+  }
+  // Closest corner for a circle
+  else if (direction2 === "circle closest-corner") {
+    const cornerRadius = Math.hypot(centerX, centerY); // Distance to the nearest corner
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      cornerRadius
+    );
+  }
+  // Farthest corner for a circle
+  else if (direction2 === "circle farthest-corner") {
+    const cornerRadius = Math.hypot(size - centerX, size - centerY); // Distance to the farthest corner
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      cornerRadius
+    );
+  }
+  // Closest side gradient for an ellipse
+  else if (direction2 === "ellipse closest-side") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      closestSide
+    );
+  }
+  // Farthest side gradient for an ellipse
+  else if (direction2 === "ellipse farthest-side") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      farthestSide
+    );
+  }
+  // Closest corner for an ellipse
+  else if (direction2 === "ellipse closest-corner") {
+    const cornerRadius = Math.hypot(centerX, centerY);
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      cornerRadius
+    );
+  }
+  // Farthest corner for an ellipse
+  else if (direction2 === "ellipse farthest-corner") {
+    const cornerRadius = Math.hypot(size - centerX, size - centerY);
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      cornerRadius
+    );
+  }
+  // Cases with specific alignments (e.g., "circle closest-side at top")
+  else if (direction2 === "circle closest-side at top") {
+    gradient = ctx.createRadialGradient(centerX, 0, 0, centerX, 0, closestSide);
+  } else if (direction2 === "circle closest-side at right") {
+    gradient = ctx.createRadialGradient(
+      size,
+      centerY,
+      0,
+      size,
+      centerY,
+      closestSide
+    );
+  } else if (direction2 === "circle closest-side at bottom") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      size,
+      0,
+      centerX,
+      size,
+      closestSide
+    );
+  } else if (direction2 === "circle closest-side at left") {
+    gradient = ctx.createRadialGradient(0, centerY, 0, 0, centerY, closestSide);
+  } else if (direction2 === "circle closest-side at center") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      closestSide
+    );
+  } else if (direction2 === "circle farthest-side at top") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      0,
+      0,
+      centerX,
+      0,
+      farthestSide
+    );
+  } else if (direction2 === "circle farthest-side at right") {
+    gradient = ctx.createRadialGradient(
+      size,
+      centerY,
+      0,
+      size,
+      centerY,
+      farthestSide
+    );
+  } else if (direction2 === "circle farthest-side at bottom") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      size,
+      0,
+      centerX,
+      size,
+      farthestSide
+    );
+  } else if (direction2 === "circle farthest-side at left") {
+    gradient = ctx.createRadialGradient(
+      0,
+      centerY,
+      0,
+      0,
+      centerY,
+      farthestSide
+    );
+  } else if (direction2 === "circle farthest-side at center") {
+    gradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      farthestSide
+    );
+  }
+
+
+
+
+
+////////////////////////////////////////////////
+
+
+     gradient.addColorStop(0, `${color1RGBA}`);
+     gradient.addColorStop(0.5, `${color2RGBA}`);
+     gradient.addColorStop(1, `${color3RGBA}`);
   }
 
   // Fill the canvas with the gradient
@@ -180,28 +531,15 @@ randomButton.addEventListener("click", () => {
 });
 
 
-
-
-
-
-
-
-
-
-// Function to update the gradient background and CSS code
-function updateGradient() {
+// function to manage rgba values
+function rgbaMethod(){
   const color1 = color1Input.value;
   const color2 = color2Input.value;
   const color3 = color3Input.value;
-  const direction = directionInput.value;
-  const direction2 = directionInput2.value;
-   const direction3 = directionInput3.value;
-  const gradientType = gradientTypeInput.value;
+
   const opacity1 = opacity1Input.value;
   const opacity2 = opacity2Input.value;
   const opacity3 = opacity3Input.value;
-
- 
 
   const color1RGBA = `rgba(${hexToRgb(color1).r}, ${hexToRgb(color1).g}, ${
     hexToRgb(color1).b
@@ -213,6 +551,50 @@ function updateGradient() {
     hexToRgb(color3).b
   }, ${opacity3})`;
 
+  // Save theme preference
+  localStorage.setItem("c1", color1);
+  localStorage.setItem("c2", color2);
+  localStorage.setItem("c3", color3);
+
+    localStorage.setItem("o1", opacity1);
+    localStorage.setItem("o2", opacity2);
+    localStorage.setItem("o3", opacity3);
+
+    return [color1RGBA, color2RGBA, color3RGBA];
+}
+
+// function to manage directions
+function directions(){
+
+  const direction = directionInput.value;
+  const direction2 = directionInput2.value;
+  const direction3 = directionInput3.value;
+
+
+   localStorage.setItem("direction", direction);
+   localStorage.setItem("direction2", direction2);
+   localStorage.setItem("direction3", direction3);
+
+  return [direction, direction2, direction3];
+
+}
+
+
+
+
+
+
+
+
+
+
+// Function to update the gradient background and CSS code
+function updateGradient() {
+
+  const [color1RGBA, color2RGBA, color3RGBA] = rgbaMethod();
+  const [direction, direction2, direction3] = directions();
+  const gradientType = gradientTypeInput.value;
+  
 
 // if & else gradient type
 
@@ -286,17 +668,9 @@ function updateGradient() {
 
 
 
-  // Save theme preference
-  localStorage.setItem("c1", color1);
-  localStorage.setItem("c2", color2);
-  localStorage.setItem("c3", color3);
+ 
   localStorage.setItem("gt", gradientType);
-  localStorage.setItem("direction", direction);
-  localStorage.setItem("o1", opacity1);
-  localStorage.setItem("o2", opacity2);
-  localStorage.setItem("o3", opacity3);
-  localStorage.setItem("direction2", direction2);
-  localStorage.setItem("direction3", direction3);
+ 
 
 }
 
