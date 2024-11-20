@@ -9,6 +9,7 @@ body {
     max-width: 100%;
     margin: 0 auto;
     text-align: center;
+    margin-top: 5px;
 }
 
 .controls {
@@ -43,11 +44,9 @@ input[type="color"], select {
 
 
 textarea {
-    width: 600px;
-    height: 50vh;
-    font-family:'Times New Roman', Times, serif;
-    resize: none;
-    font-size:large;
+    width: 100%;
+    height: 25vh;
+    
     background-color: rgb(47, 42, 42);
     font: 700;
     color: rgb(239, 142, 16);
@@ -73,8 +72,40 @@ textarea {
     margin: 0 auto;
 }
 
-
-.copy-css {
-    position: relative;
-    left: 46.5%;
+#cssOutput, #sassOutput, #lessOutput {
+    font-size: 1.5rem;
 }
+
+
+#col {
+    height: 5vh;
+}
+
+main {
+    margin: 5px;
+    
+}
+
+
+
+
+    ul {
+      list-style: disc ;
+      padding-left: 20px;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+    }
+
+    #closeButton {
+         width: 50px; /* Adjust the width as needed */
+  height: 50px;
+  position: absolute;
+  top: 2px; /* Adjust the top position as needed */
+  right: 2px; /* Adjust the right position as needed */
+/* Example background color */
+
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+    }

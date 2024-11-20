@@ -5,6 +5,8 @@ const color3Input = document.getElementById("color3");
 const gradientTypeInput = document.getElementById("gradientType");
 const preview = document.getElementById("preview");
 const cssOutput = document.getElementById("cssOutput");
+const sassOutput = document.getElementById("sassOutput");
+const lessOutput = document.getElementById("lessOutput");
 const directionInput = document.getElementById("direction-linear");
 const directionInput2 = document.getElementById("direction-radial");
 const directionInput3 = document.getElementById("direction-conic");
@@ -15,12 +17,117 @@ const opacity2Input = document.getElementById("opacity2");
 const opacity3Input = document.getElementById("opacity3");
 const randomButton = document.getElementById("randombutton");
 const download = document.getElementById("download");
+const presetValue = document.getElementById("presetValue");
+const appliedGradient = document.getElementById("appliedgradient");
 
- let gradientCSS = null;
+let gradientCSS = null;
+
+
+function preset() {
+  console.log(typeof presetValue.value);
+
+  preview.setAttribute("style",`background: ${presetValue.value}`);
+
+
+
+  cssOutput.value = `background: ${presetValue.value}`;
+  sassOutput.value = `@mixin gradient-bg {
+          ${presetValue.value};
+    }
+  .my-class {
+  @include gradient-bg;
+}`;
+
+  lessOutput.value = `.gradient-bg() {
+      ${presetValue.value};
+    }
+
+  .my-class {
+  .conic-gradient-bg;
+  }`;
+
+}
+
+function validateGradientLength(gradientString) {
+  const minLength = 30; // Adjust the minimum length as needed
+  const maxLength = 250;
+
+  if (gradientString.length < minLength || gradientString.length > maxLength) {
+    return alert("Enter a Valid gradient");
+  }
+
+  return 0;
+}
+
+
+
+
+
+
+//hover effect
+
+// Add mouseover event to change style when hovered
+cssOutput.addEventListener("mouseover", function () {
+  cssOutput.style.background = "rgb(47, 42, 42)"; // Setting background color
+  cssOutput.style.transform = "scale(1.005)"; // scale effect
+});
+
+// Add mouseout event to revert style when hover ends
+cssOutput.addEventListener("mouseout", function () {
+  cssOutput.style.background = gradientCSS;; // Reset background to original or empty string
+  cssOutput.style.transform = "scale(1)"; // revert scale effect
+});
+
+sassOutput.addEventListener("mouseover", function () {
+  sassOutput.style.background = "rgb(47, 42, 42)"; // Setting background color
+  sassOutput.style.transform = "scale(1.005)"; // scale effect
+});
+
+// Add mouseout event to revert style when hover ends
+sassOutput.addEventListener("mouseout", function () {
+  sassOutput.style.background = gradientCSS; // Reset background to original or empty string
+  sassOutput.style.transform = "scale(1)"; // revert scale effect
+});
+
+lessOutput.addEventListener("mouseover", function () {
+  lessOutput.style.background = "rgb(47, 42, 42)"; // Setting background color
+  lessOutput.style.transform = "scale(1.005)"; // scale effect
+});
+
+// Add mouseout event to revert style when hover ends
+lessOutput.addEventListener("mouseout", function () {
+  lessOutput.style.background = gradientCSS; // Reset background to original or empty string
+  lessOutput.style.transform = "scale(1)"; // revert scale effect
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //this function is complex will wait for it to be done
 function downloadFile() {
+
+  
   const [color1RGBA, color2RGBA, color3RGBA] = rgbaMethod();
   const [direction, direction2, direction3] = directions();
   const gradientTypeValue = gradientTypeInput.value;
@@ -477,11 +584,8 @@ function previewModeScreen() {
 
 
 
- function copyToClipboard() {
+ function copyToClipboardCss() {
    const cssCode = document.getElementById("cssOutput").value;
-
-
-   console.log( cssCode);
 
    navigator.clipboard
      .writeText(cssCode)
@@ -492,8 +596,70 @@ function previewModeScreen() {
        console.error("Failed to copy text: ", err);
      }); 
 
-
  }
+
+
+function copyToClipboardSass() {
+  
+  const sassCode = document.getElementById("sassOutput").value;
+
+
+
+  navigator.clipboard
+    .writeText(sassCode)
+    .then(() => {
+      console.log("Sass code copied to clipboard successfully!");
+    })
+    .catch((err) => {
+      console.error("Failed to copy text: ", err);
+    });
+}
+
+
+function copyToClipboardLess() {
+
+  const lessCode = document.getElementById("lessOutput").value;
+
+  
+
+  navigator.clipboard
+    .writeText(lessCode)
+    .then(() => {
+      console.log("less code copied to clipboard successfully!");
+    })
+    .catch((err) => {
+      console.error("Failed to copy text: ", err);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function getRandomColor() {
   const letters = "0123456789ABCDEF";
@@ -651,7 +817,7 @@ function updateGradient() {
        gradientCSS = `linear-gradient(${
          inputdeg ? inputdeg : direction
        }, ${color1RGBA}, ${color2RGBA}, ${color3RGBA})`;
-       console.log(gradientCSS);
+       console.log(typeof gradientCSS);
      } else if (gradientType === "radial") {
        gradientCSS = `radial-gradient(${direction2}, ${color1RGBA}, ${color2RGBA}, ${color3RGBA})`;
      } else {
@@ -664,7 +830,28 @@ function updateGradient() {
 
   // Show the generated CSS code in the textarea
   cssOutput.value = `background: ${gradientCSS};`;
+  sassOutput.value = 
+  `@mixin gradient-bg {
+          ${gradientCSS};
+    }
+  .my-class {
+  @include gradient-bg;
+}`;
+
+  lessOutput.value = 
+  `.gradient-bg() {
+      ${gradientCSS};
+    }
+
+  .my-class {
+  .conic-gradient-bg;
+  }`;
+
+
+
   cssOutput.style.background = "None";
+  sassOutput.style.background = "None";
+  lessOutput.style.background = "None";
 
 
 
@@ -738,6 +925,8 @@ if(color1 && color2 && color3 && gradientType && direction){
 }
 
 });
+
+
 
 
 
