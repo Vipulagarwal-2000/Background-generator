@@ -4,6 +4,8 @@ const color2Input = document.getElementById("color2");
 const color3Input = document.getElementById("color3");
 const gradientTypeInput = document.getElementById("gradientType");
 const preview = document.getElementById("preview");
+const gradientBlockIpad = document.getElementById("gradient-block-ipad");
+const gradientBlock = document.getElementById("gradient-block");
 const cssOutput = document.getElementById("cssOutput");
 const sassOutput = document.getElementById("sassOutput");
 const lessOutput = document.getElementById("lessOutput");
@@ -16,6 +18,8 @@ const opacity1Input = document.getElementById("opacity1");
 const opacity2Input = document.getElementById("opacity2");
 const opacity3Input = document.getElementById("opacity3");
 const randomButton = document.getElementById("randombutton");
+const randomButton2 = document.getElementById("randombutton2");
+const randomButton3 = document.getElementById("randombutton3");
 const download = document.getElementById("download");
 const presetValue = document.getElementById("presetValue");
 const appliedGradient = document.getElementById("appliedgradient");
@@ -697,6 +701,10 @@ randomButton.addEventListener("click", () => {
 });
 
 
+
+
+
+
 // function to manage rgba values
 function rgbaMethod(){
   const color1 = color1Input.value;
@@ -927,9 +935,196 @@ if(color1 && color2 && color3 && gradientType && direction){
 });
 
 
+// Get the button:
+let mybutton = document.getElementById("myBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 1000 || document.documentElement.scrollTop > 350) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
 
 
 
+function laidBackPreview() {
+  
+  document.documentElement.scrollTop = 600;
+}
+
+function iphoneBackPreview() {
+  document.documentElement.scrollTop = 1160;
+}
+
+function ipadBackPreview() {
+  document.documentElement.scrollTop = 1250;
+}
+
+
+
+
+
+randomButton2.addEventListener("click", () => {
+  const randomColor1 = getRandomColor();
+  const randomColor2 = getRandomColor();
+  const randomColor3 = getRandomColor();
+  const randomOpacity1 = getRandomOpacity();
+  const randomOpacity2 = getRandomOpacity();
+  const randomOpacity3 = getRandomOpacity();
+
+  const randomGradientType =
+    Math.random() >= 0.7 ? "linear" : Math.random() >= 0.4 ? "radial" : "conic";
+
+  color1Input.value = randomColor1;
+  color2Input.value = randomColor2;
+  color3Input.value = randomColor3;
+  opacity1Input.value = randomOpacity1;
+  opacity2Input.value = randomOpacity2;
+  opacity3Input.value = randomOpacity3;
+  gradientTypeInput.value = randomGradientType;
+
+  updateiphone(0);
+});
+
+
+
+randomButton3.addEventListener("click", () => {
+  const randomColor1 = getRandomColor();
+  const randomColor2 = getRandomColor();
+  const randomColor3 = getRandomColor();
+  const randomOpacity1 = getRandomOpacity();
+  const randomOpacity2 = getRandomOpacity();
+  const randomOpacity3 = getRandomOpacity();
+
+  const randomGradientType =
+    Math.random() >= 0.7 ? "linear" : Math.random() >= 0.4 ? "radial" : "conic";
+
+  color1Input.value = randomColor1;
+  color2Input.value = randomColor2;
+  color3Input.value = randomColor3;
+  opacity1Input.value = randomOpacity1;
+  opacity2Input.value = randomOpacity2;
+  opacity3Input.value = randomOpacity3;
+  gradientTypeInput.value = randomGradientType;
+
+  updateiphone(1);
+});
+
+
+const supercloseButton = document.getElementById('supercloseButton');
+supercloseButton.addEventListener('click',function(){
+    document.documentElement.scrollTop = 0;
+})
+
+
+const supercloseButton2 = document.getElementById("supercloseButton2");
+supercloseButton2.addEventListener("click", function () {
+  document.documentElement.scrollTop = 0;
+});
+
+
+
+
+
+
+function updateiphone(val){
+ const [color1RGBA, color2RGBA, color3RGBA] = rgbaMethod();
+  const [direction, direction2, direction3] = directions();
+  const gradientType = gradientTypeInput.value;
+  
+
+// if & else gradient type
+
+
+  directionInput.removeAttribute("hidden");
+  directionInput.removeAttribute("style");
+  directionInput2.removeAttribute("style");
+  directionInput3.removeAttribute("style");
+  directionInput2.removeAttribute("hidden");
+  directionInput3.removeAttribute("hidden");
+
+
+  switch(gradientType){
+  case "radial" : 
+     directionInput.setAttribute("hidden", true);
+     directionInput3.setAttribute("hidden", true);
+     break;
+
+   case "linear": 
+     directionInput2.setAttribute("hidden", true);
+      directionInput3.setAttribute("hidden", true);
+     break;
+
+   case "conic": 
+     directionInput2.setAttribute("style", "display:none;");
+     directionInput.setAttribute("style", "display:none;");
+   break;
+  }
+
+
+
+
+
+  if (direction === "custom" && gradientType === "radial") {
+    customInput.setAttribute("style", "display:none;");
+  }else if (direction === "custom") {
+    customInput.removeAttribute("style");
+  }else {
+    customInput.setAttribute("style", "display:none;");
+  }
+ 
+  let inputdeg = 0;
+
+  document
+    .getElementById("custom-angle")
+    .addEventListener("input", function () {
+      inputdeg = this.value + "deg";
+      console.log(inputdeg);
+
+    });
+
+
+     if (gradientType === "linear") {
+       gradientCSS = `linear-gradient(${
+         inputdeg ? inputdeg : direction
+       }, ${color1RGBA}, ${color2RGBA}, ${color3RGBA})`;
+       console.log(typeof gradientCSS);
+     } else if (gradientType === "radial") {
+       gradientCSS = `radial-gradient(${direction2}, ${color1RGBA}, ${color2RGBA}, ${color3RGBA})`;
+     } else {
+       gradientCSS = `conic-gradient(${direction3}, ${color1RGBA}, ${color2RGBA}, ${color3RGBA})`;
+     }
+
+  if (val === 0){
+    // Apply the gradient to the preview div
+    gradientBlock.style.background = gradientCSS;
+  }
+  else {
+    gradientBlockIpad.style.background = gradientCSS;
+  }
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+ 
+}
 
 
 

@@ -33,12 +33,15 @@ input[type="color"], select {
 
 .background-div {
   position: absolute;
+  
   top: 0;
   left: 0;
+  right: 0; bottom: 0;
   width: 100%;
-  height: 100%;
+  height: 300vh;
   
   z-index: -1; /* Lower z-index to push it to the background */
+  overflow-y: auto;
 }
 
 
@@ -109,3 +112,165 @@ main {
   cursor: pointer;
 
     }
+      #supercloseButton {
+         width: 150px; /* Adjust the width as needed */
+  height: 150px;
+  position: absolute;
+  top: 2px; /* Adjust the top position as needed */
+  right: 2px; /* Adjust the right position as needed */
+/* Example background color */
+
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+    }
+
+    #supercloseButton2 {
+         width: 150px; /* Adjust the width as needed */
+  height: 150px;
+  position: absolute;
+  top: 2px; /* Adjust the top position as needed */
+  right: 2px; /* Adjust the right position as needed */
+/* Example background color */
+
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+    }
+
+    #buildul {
+        height: 30vh;
+        overflow: auto;
+    }
+
+
+    #myBtn {
+  display: none; /* Hidden by default */
+  position: fixed; /* Fixed/sticky position */
+  bottom: 20px; /* Place the button at the bottom of the page */
+  right: 30px; /* Place the button 30px from the right */
+  z-index: 99; /* Make sure it does not overlap */
+  border-radius: 50%;
+  
+
+  
+}
+
+
+#iphone {
+    position: absolute;
+    top: 120vh;
+    z-index: 99;
+    height: 110vh;
+    width: 80%;
+    overflow: hidden;
+    
+    
+}
+
+.card.card-body.iphone {
+   padding: 0%;
+   
+}
+
+
+.gradient-preview {
+
+ height: 872px;
+    width: 420px;
+  
+  
+  
+  overflow: hidden;
+}
+
+.gradient-block {
+height: 872px;
+    width: 420px;
+   
+  background-image: linear-gradient(to right, red, blue); /* Initial gradient */
+  filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.3));
+  animation: rotate 5s infinite alternate;
+ 
+  perspective: 300px;
+  border: 5px solid rgba(0, 0, 0, 0.393);
+  display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  
+
+  
+}
+
+
+@keyframes rotate {
+ 0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(30deg); }
+}
+
+
+#apple {
+   height: 33%;
+   width: 33%;
+    
+}
+
+
+
+#ipad {
+    position: absolute;
+    top: 120vh;
+    z-index: 99;
+    height: 110vh;
+    width: 80%;
+    overflow: hidden;
+    
+    
+}
+
+.card.card-body.ipad {
+   padding: 0%;
+   
+}
+
+
+.gradient-preview-ipad {
+
+ height: 1080px;
+    width: 820px;
+  
+  
+  
+  overflow: hidden;
+}
+
+.gradient-block-ipad {
+height: 1080px;
+    width: 820px;
+   
+  background-image: linear-gradient(to right, red, blue); /* Initial gradient */
+  filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.3));
+  animation: rotate 5s infinite alternate;
+ 
+  perspective: 300px;
+  border: 5px solid rgba(0, 0, 0, 0.393);
+  display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  
+
+  
+}
+
+
+@keyframes rotate {
+ 0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(30deg); }
+}
+
+
+
